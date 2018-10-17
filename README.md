@@ -18,6 +18,8 @@ If you want to collect the TOP logs for a particular processID
  
  -p processID -d timeinterval ( collect every 60 seconds here ) -b batch mode
  
+ You should have only one processID in your log file.
+ 
  Your log file will look like this 
 
 ```
@@ -47,8 +49,11 @@ KiB Swap:  3000256 total,  2461376 free,   538880 used. 10564290+avail Mem
  
  # To Run the Program
  
+ Copy the program and the log file to a new Folder and Run 
+ 
  ```
   python3 read_logs.py -f toplogs.txt -p 61447
  ```
+ # The Output Files Look Like Below 
  
- 
+ ![Alt text](https://github.com/kaushikvelusamy/linux-top-parser-graph-maker/blob/master/output.png)
