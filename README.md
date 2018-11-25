@@ -13,7 +13,7 @@ This program requires Pandas and MatplotLib packages
 If you want to collect the TOP logs for a particular processID 
 
 ```
- top -p 140432 -b -d 60 > myprocesslogs.log
+ top -p 140432 -b -d 60 > toplogs_sample.log
 ```
  
  -p processID -d timeinterval ( collect every 60 seconds here ) -b batch mode
@@ -52,8 +52,16 @@ KiB Swap:  3000256 total,  2461376 free,   538880 used. 10564290+avail Mem
  Copy the program and the log file to a new Folder and Run 
  
  ```
-  python3 read_logs.py -f toplogs.txt -p 61447
+  python3 read_logs.py -f toplogs_sample.log -p 61447 -n kv_fileload
  ```
  # The Output Files Look Like Below 
  
  ![Alt text](https://github.com/kaushikvelusamy/linux-top-parser-graph-maker/blob/master/output.png)
+
+ # Quick Reference for understanding the TOP ouput
+
+ 1. https://www.booleanworld.com/guide-linux-top-command/
+ 2. https://linuxaria.com/howto/understanding-the-top-command-on-linux
+
+ 
+ 

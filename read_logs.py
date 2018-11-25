@@ -7,10 +7,17 @@ import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--file", "-f", type=str, required=True)
-parser.add_argument("--process", "-p", type=str, required=True)
+parser.add_argument("--processID", "-p", type=str, required=True)
+parser.add_argument("--processName", "-n", type=str, required=True)
+
 args = parser.parse_args()
-log_text = open(args.file)
+filename = args.file
+pid = args.processID
+pname = args.processName
+
+log_text = open(filename)
 content_dict = defaultdict(list)
+
 for line in log_text:
 	if line.startswith('top'):
 		linecontent = map(lambda x: x.strip(),line.split("top - ")[1].split(","))
@@ -27,7 +34,7 @@ for line in log_text:
 	if line.startswith('KiB Swap:'):
 		linecontent = map(lambda x: x.strip(),line.split("KiB Swap:  ")[1].split(","))
 		content_dict['Swap Memory'].append(linecontent)
-	if args.process in line:
+	if pid in line:
 		subline = {}
 		#print line
 		linecontent = list(filter(lambda x: x!='',line.split(' ')))
@@ -41,18 +48,22 @@ for line in log_text:
 		subline['percent_MEM']=float(linecontent[9])
 		
 		content_dict['Rest'].append(subline)
-		if 'kv_fileload' not in line:
+		if pname not in line:
 			break
 
 top_line = content_dict['top']
 top_line_header = ['complete_time', 'hour_min', 'users', 'load_average_1', 'load_average_2', 'load_average_3']
 processed_top_line_header = ['idx','complete_time', 'users', 'load_average_1', 'load_average_2', 'load_average_3']
 processed_top_rows = []
+
+
 for idx,row in enumerate(top_line):
 	curr_entry = dict(zip(top_line_header,row))
 	processed_row = [idx, datetime.datetime.strptime(curr_entry['complete_time'].split(" up ")[0],"%H:%M:%S").time(), int(curr_entry['users'].strip(" users")), float(curr_entry['load_average_1'].strip("load average: ")), float(curr_entry['load_average_2']), float(curr_entry['load_average_3'])]
 	processed_top_rows.append(processed_row)
+
 df = pd.DataFrame(processed_top_rows,columns = processed_top_line_header)
+
 line1=df.plot.line(x='complete_time', y='users')
 plt.savefig('line1')
 line2=df.plot.line(x='complete_time', y='load_average_1')
@@ -61,14 +72,17 @@ line3=df.plot.line(x='complete_time', y='load_average_2')
 plt.savefig('line3')
 line4=df.plot.line(x='complete_time', y='load_average_3')
 plt.savefig('line4')
+
 tasks = content_dict['Tasks']
 tasks_header = ['total', 'running', 'sleeping', 'stopped', 'zombie']
 processed_task_header = ['idx', 'total', 'running', 'sleeping', 'stopped', 'zombie']
 task_rows = []
+
 for idx,row in enumerate(tasks):
 	zip_entry = zip(tasks_header,row)
 	processed_row = [idx]+ list(map(lambda x: int(x[1].strip(" "+x[0])),zip_entry))
 	task_rows.append(processed_row)
+
 task_df = pd.DataFrame(task_rows,columns = processed_task_header)
 
 df = pd.merge(df, task_df, on='idx')
@@ -88,10 +102,12 @@ tasks = content_dict['Cpu']
 tasks_header = ['us', 'sy', 'ni', 'id', 'wa', 'hi', 'si', 'st']
 processed_task_header = ['idx', 'us', 'sy', 'ni', 'id', 'wa', 'hi', 'si', 'st']
 task_rows = []
+
 for idx,row in enumerate(tasks):
 	zip_entry = zip(tasks_header,row)
 	processed_row = [idx]+ list(map(lambda x: float(x[1].strip(" "+x[0])),zip_entry))
 	task_rows.append(processed_row)
+
 task_df = pd.DataFrame(task_rows,columns = processed_task_header)
 
 df = pd.merge(df, task_df, on='idx')
@@ -116,6 +132,7 @@ tasks = content_dict['Memory in KiB']
 tasks_header = ['+total', ' free', '+used', '+buff/cache']
 processed_task_header = ['idx', 'total_memory', 'free', 'used', 'buffer/cache']
 task_rows = []
+
 for idx,row in enumerate(tasks):
 	row = list(row)
 	if '+free' in row[1]:
@@ -123,6 +140,7 @@ for idx,row in enumerate(tasks):
 	zip_entry = list(zip(tasks_header,row))
 	processed_row = [idx]+ list(map(lambda x: float(x[1].strip(x[0])),zip_entry))
 	task_rows.append(processed_row)
+
 task_df = pd.DataFrame(task_rows,columns = processed_task_header)
 
 df = pd.merge(df, task_df, on='idx')
@@ -140,6 +158,7 @@ tasks = content_dict['Swap Memory']
 tasks_header = [' total', ' free', ' used', 'rest']
 processed_task_header = ['idx', 'total_swap_memory', 'swap_free', 'swap_used', 'swap_avail_mem']
 task_rows = []
+
 for idx,row in enumerate(tasks):
 	zip_entry = list(zip(tasks_header,row))
 	processed_row = [idx]+ list(map(lambda x: float(x[1].strip(" "+x[0])),zip_entry[:-1]))
@@ -149,6 +168,7 @@ for idx,row in enumerate(tasks):
 	swap_mem = float(swap_mem.split("+avail Mem")[0])
 	processed_row += [used, swap_mem]
 	task_rows.append(processed_row)
+
 task_df = pd.DataFrame(task_rows,columns = processed_task_header)
 # print task_df
 
@@ -167,12 +187,12 @@ tasks = content_dict['Rest']
 tasks_header = ['PR', 'NI', 'VIRT', 'RES', 'SHR', 'percent_CPU', 'percent_MEM']
 processed_task_header = ['idx', 'PR', 'NI', 'VIRT', 'RES', 'SHR', 'percent_CPU', 'percent_MEM']
 task_rows = []
+
 for idx,row in enumerate(tasks):
 	row1 = [idx]+[row[x] for x in tasks_header]
 	task_rows.append(row1)
+
 task_df = pd.DataFrame(task_rows,columns = processed_task_header)
-
-
 
 df = pd.merge(df, task_df, on='idx')
 
@@ -191,13 +211,4 @@ line31=df.plot.line(x='complete_time', y='percent_CPU')
 plt.savefig('line31')
 line32=df.plot.line(x='complete_time', y='percent_MEM')
 plt.savefig('line32')
-
-
-
-
-
-
-	
-
-
 
