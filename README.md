@@ -2,6 +2,8 @@
 
 This program generate graphs from the linux TOP command log file. 
 
+This program was written on IBM Power 8 S822LC Minsky Machine running Ubuntu 16.04. 
+
  # Requirements 
  
 This program is written in python 3. 
@@ -19,8 +21,9 @@ If you want to collect the TOP logs for a particular processID
  -p processID -d timeinterval ( collect every 60 seconds here ) -b batch mode
  
  You should have only one processID in your log file.
+
  
- Your log file will look like this 
+ Your log file should look like this 
 
 ```
 top - 21:35:21 up 50 days,  4:00, 11 users,  load average: 11.32, 5.13, 2.93
@@ -63,5 +66,4 @@ KiB Swap:  3000256 total,  2461376 free,   538880 used. 10564290+avail Mem
  1. https://www.booleanworld.com/guide-linux-top-command/
  2. https://linuxaria.com/howto/understanding-the-top-command-on-linux
 
- 
  
