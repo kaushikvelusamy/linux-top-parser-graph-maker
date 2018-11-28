@@ -77,7 +77,7 @@ for idx,row in enumerate(top_line):
 df = pd.DataFrame(processed_top_rows,columns = processed_top_line_header)
 
 line1=df.plot.line(x='complete_time', y='users')
-plt.title('Total Time The TOP Logs Were Monitored');
+plt.title('Total Time The TOP Logs Were Monitored and Total Logged In Users');
 plt.savefig('line1')
 line2=df.plot.line(x='complete_time', y='load_average_1')
 plt.title('Average Load On The System To The Last 1 Minute');
